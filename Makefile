@@ -4,7 +4,7 @@ DEV = attiny85
 
 CC = avr-gcc
 OBJCOPY = avr-objcopy
-CFLAGS = -c -DF_CPU=8000000UL -mmcu=$(DEV)
+CFLAGS = -Os -c -DF_CPU=8000000UL -mmcu=$(DEV)
 LDFLAGS =  -mmcu=$(DEV)
 
 PROG = usbtiny
