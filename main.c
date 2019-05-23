@@ -3,7 +3,7 @@
 #include <stdint.h>
 
 #define NEXT 			PB2
-#define PREV 			PB3
+#define PREV 			PB0
 
 typedef enum {NONE, RIGHT, LEFT} STATUS;
 
@@ -73,7 +73,7 @@ int main (void) {
 	}
 #endif
 
-#if 1
+#if 0
 
 	uint8_t i = 0;
 	while (1) {
@@ -89,24 +89,32 @@ int main (void) {
 	PORTB |= (1 << NEXT) | (1 << PREV);
 
 
-	enable_pwm ();
-	while (1);
-
+	STATUS doing = NONE;
 	while (1) {
-		STATUS doing = NONE;
 		uint8_t code = 0;
 
-		if (PINB & (1 << NEXT)) {
-			doing = RIGHT;
-		}
-		else if (PINB & (1 << PREV)) {
-			doing = LEFT;
-		}
+		if (doing == NONE) {
+			if ( (PINB & (1 << NEXT)) == 0) {
+				doing = RIGHT;
+				code = 0x08;
+			}
+			else if ( (PINB & (1 << PREV)) == 0) {
+				doing = LEFT;
+				code = 0x5a;
+			}
 
-		if (doing != NONE) {
-			enable_pwm ();
-			send_code ( code );
-			disable_pwm ();
+			if (doing != NONE) {
+				enable_pwm ();
+				send_code ( code );
+				disable_pwm ();
+			}
+		}
+		else {
+			_delay_ms (40);
+
+			if ( (PINB & (1 << PREV)) &&
+				 (PINB & (1 << NEXT)) )
+				doing = NONE;
 		}
 
 	}
